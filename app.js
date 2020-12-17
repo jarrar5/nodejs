@@ -19,7 +19,6 @@ app.get('/', (req, res) => {
 })
 
 app.get('/books', function (req, res) {
-  console.log('books.html!');
   res.render('books',{
     title: 'Books'
   });
