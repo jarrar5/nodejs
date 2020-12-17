@@ -1,0 +1,23 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jarrar5/nodejs.git"
+  },
+  "author": "jarrar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jarrar5/nodejs/issues"
+  },
+  "homepage": "https://github.com/jarrar5/nodejs#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pug": "^3.0.0"
+  }
+}
