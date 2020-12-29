@@ -1,5 +1,18 @@
 extends layout
 
 block content
-    .container(style="margin:auto;min-height:500px;")
-        h1#home(style="text-align:center;padding:20%") Books
+    .container(style="margin:auto;min-height:50px;")
+        h4#home(style="text-align:right;") Books
+        table.tg
+            thead
+                tr
+                    th.tg-lboi Title
+                    th.tg-0pky Author
+                    th.tg-0pky Other
+            tbody
+                each book in books
+                    tr
+                        td.tg-0pky=book.title
+                        td.tg-0pky=book.author
+                        td.tg-0pky
+

@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 
 const app =express();
 
@@ -19,7 +20,33 @@ app.get('/', (req, res) => {
 })
 
 app.get('/books', function (req, res) {
-  res.render('books',{
-    title: 'Books'
-  });
+    var books = [];
+    // = [
+    //     {title:'ABC', author:'abc'},
+    //     {title:'DEF', author:'def'},
+    //     {title:'GHI', author:'ghi'}
+    // ];
+
+    fs.readFile('data/file.json', "UTF8", function (err, data) {
+      if (err) { console.log('Error Reading File!') }
+      books = JSON.parse(data);
+      //console.log(data);
+      //console.log(books);
+    //   try {
+    //     list = JSON.parse(data);
+    //     var test = rules.validate(list)
+    //     console.log(test);
+    //     console.log("Done")
+
+        process(books);
+    //   }
+    //   catch (e) { console.log('JSON not valid') }
+    });
+    function process(books) {
+        console.log(books);
+    res.render('books',{
+        title: 'Books',
+        books:books
+    });
+    }
 });
