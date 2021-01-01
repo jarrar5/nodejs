@@ -2,30 +2,19 @@ extends layout
 
 block content
     .container(style="margin:auto;min-height:50px;")
-        script.
-            function edit(id) {
-                $.ajax({
-                url: '/edit',
-                method: 'GET',
-                data: id
-                })
-            }
         h4#home(style="text-align:right;") Books
         table.tg
             thead
                 tr
                     th.tg-lboi Title
                     th.tg-0pky Author
-                    th.tg-0pky Action
+                    th.tg-0pky(colspan="2") Actions
             tbody
                 each book in books
                     tr
                         td.tg-0pky=book.title
                         td.tg-0pky=book.author
-                        td.tg-0pky 
-                            //- button.btn-primary(onclick="edit("+book.id+")") Edit
-                            
-                            a.nav-link(href="/edit/"+book.id type="button")
-                                button.btn-danger Delete
-                            
-
+                        td.tg-0pky
+                            a.myButton(href="/edit/"+book.id) Edit
+                        td.tg-0pky
+                            a.delete(href="/delete/"+book.id) Delete

@@ -9,7 +9,8 @@ const app = express();
 const schema = Joi.object({
     id: Joi.number(),
     title: Joi.string(),
-    author: Joi.string()
+    author: Joi.string(),
+
 })
 
 const rules = Joi.array().items(schema);
@@ -41,6 +42,8 @@ app.get('/books', function (req, res) {
         }
         try {
             books = JSON.parse(data);
+            var test = rules.validate(books)
+            console.log('Error: ' + test.error);
         }
         catch (e) {
             console.log('Error Alert: ' + e);
@@ -65,6 +68,8 @@ app.get('/addbook', (req, res) => {
 app.post('/addbook', (req, res) => {
     console.log('URL: /books Type: POST');
     var form = { title: req.body.title, author: req.body.author };
+    var test = schema.validate(form);
+    console.log('Error: ' + test.error);
     var list = [];
 
     if (form.title != '' && form.author != '') {
@@ -76,46 +81,50 @@ app.post('/addbook', (req, res) => {
         console.log('Nothing Written');
         res.redirect('/error');
     }
+
+
+    function readFileData(pushNew, form) {
+        fs.readFile('data/file.json', "UTF8", function (err, data) {
+            if (err) { console.log('Error Reading File!') }
+            try {
+                list = JSON.parse(data);
+                var test = rules.validate(list)
+                console.log('Error: ' + test.error);
+            }
+            catch (e) {
+                list = [];
+                console.log(e)
+            }
+            finally {
+                pushNew(list, form);
+            }
+        });
+    }
+
+    function pushNew(list, form) {
+        console.log('Length: ' + list.length);
+        var id = generateID(list);
+        form.id = id;
+        list.push(form);
+
+        fs.writeFile('data/file.json', JSON.stringify(list), function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+        });
+    }
+
+    function generateID(list) {
+        if (list.length != 0) {
+            return list[list.length - 1].id + 1;
+        }
+        else {
+            return 1;
+        }
+    }
+
 })
 
-function readFileData(pushNew, form) {
-    fs.readFile('data/file.json', "UTF8", function (err, data) {
-        if (err) { console.log('Error Reading File!') }
-        try {
-            list = JSON.parse(data);
-        }
-        catch (e) {
-            list = [];
-            console.log(e)
-        }
-        finally {
-            pushNew(list, form);
-        }
-    });
-}
-
-function pushNew(list, form) {
-    console.log('Length: ' + list.length);
-    var id = generateID(list);
-    form.id = id;
-    list.push(form);
-
-    fs.writeFile('data/file.json', JSON.stringify(list), function (err) {
-        if (err) throw err;
-        console.log('Saved!');
-    });
-}
-
-function generateID(list) {
-    if (list.length != 0) {
-        return list[list.length - 1].id + 1;
-    }
-    else {
-        return 1;
-    }
-}
-
-app.get('/edit/:id', (req, res) => {
+app.get('/delete/:id', (req, res) => {
     console.log(req.params.id);
     var id = req.params.id;
 
@@ -128,6 +137,8 @@ app.get('/edit/:id', (req, res) => {
             if (err) { console.log('Error Reading File!') }
             try {
                 list = JSON.parse(data);
+                var test = rules.validate(list)
+                console.log('Error: ' + test.error);
                 deleteData(list, id, writeData);
             }
             catch (e) {
@@ -155,22 +166,102 @@ app.get('/edit/:id', (req, res) => {
     }
 })
 
-// app.get('/books', function (req, res) {
-//     console.log('URL: /books Type: GET');
+app.get('/edit/:id', (req, res) => {
+    console.log('URL: /edit Type: GET');
 
-//     var books = [];
+    console.log(req.params.id);
+    var id = req.params.id;
 
-//     fs.readFile('data/file.json', "UTF8", function (err, data) {
-//         if (err) { console.log('Error Reading File!') }
-//         books = JSON.parse(data);
+    var book = {};
 
-//         process(books);
-//     });
-//     function process(books) {
-//         console.log(books);
-//         res.render('books', {
-//             title: 'Books',
-//             books: books
-//         });
-//     }
-// });
+    readFileData(getData, id);
+
+    function readFileData(getData, id) {
+        fs.readFile('data/file.json', "UTF8", function (err, data) {
+            if (err) { console.log('Error Reading File!') }
+            try {
+                list = JSON.parse(data);
+                var test = rules.validate(list)
+                console.log('Error: ' + test.error);
+                getData(list, id, changeView);
+            }
+            catch (e) {
+                console.log(e)
+            }
+        });
+    }
+
+    function getData(list, id, changeView) {
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].id == id) {
+                book = { id: list[i].id, title: list[i].title, author: list[i].author };
+                break;
+            }
+        }
+        var test = schema.validate(book)
+        console.log('Error: ' + test.error);
+        changeView(res);
+    }
+
+    function changeView(res) {
+        res.render('editbook', {
+            title: 'Edit Book',
+            book: book
+        });
+    }
+})
+
+app.post('/edit/:id', (req, res) => {
+    console.log('URL: /edit Type: POST');
+
+    var form = { id: req.params.id, title: req.body.title, author: req.body.author };
+    var list = [];
+
+    var test = schema.validate(form)
+    console.log('Error: ' + test.error);
+
+    console.log(req.params.id);
+
+    if (form.title != '' && form.author != '') {
+        readFileData(editData, form);
+
+        res.redirect('/books');
+    }
+    else {
+        console.log('Nothing Written');
+        res.redirect('/error');
+    }
+
+    function readFileData(editData, id) {
+        fs.readFile('data/file.json', "UTF8", function (err, data) {
+            if (err) { console.log('Error Reading File!') }
+            try {
+                list = JSON.parse(data);
+                var test = rules.validate(list)
+                console.log('Error: ' + test.error);
+                editData(list, id, writeData);
+            }
+            catch (e) {
+                console.log(e)
+            }
+        });
+    }
+
+    function editData(list, id, writeData) {
+        // console.log('Index: '+list.indexOf());
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].id == form.id) {
+                list[i].title = form.title;
+                list[i].author = form.author;
+            }
+        }
+        writeData(list);
+    }
+
+    function writeData(list) {
+        fs.writeFile('data/file.json', JSON.stringify(list), function (err) {
+            if (err) throw err;
+            console.log('Saved!');
+        });
+    }
+})

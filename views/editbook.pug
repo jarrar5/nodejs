@@ -1,0 +1,26 @@
+extends layout
+
+block content
+    .container(style="margin:auto;min-height:50px;")
+        h4#home(style="text-align:right;") Edit Book
+    .container(style="margin:auto;min-height:50px;")
+        form.form-horizontal(action="/edit/"+book.id  method="post")
+            fieldset
+                // Form Name
+                legend
+                // Text input
+                .form-group
+                    label.col-md-4.control-label(for="title") Title
+                    .col-md-6
+                        input#title.form-control.input-md(name="title" type="text" placeholder="Enter Book Title" value=book.title required="")
+                // Text input
+                .form-group
+                    label.col-md-4.control-label(for="author") Author
+                    .col-md-6
+                        input#author.form-control.input-md(name="author" type="text" placeholder="Enter Book Author" value=book.author required="")
+                // Button (Double)
+                .form-group
+                    label.col-md-4.control-label(for="save")
+                    .col-md-8(style="float: right;")
+                        button#save.btn.btn-success(type="submit" name="save") Save
+                        button#clear.btn.btn-danger(type="reset" name="clear") Clear
